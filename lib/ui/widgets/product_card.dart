@@ -1,7 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_shopping_cart_mvvm/domain/entities/product_entity.dart';
+import 'package:flutter_shopping_cart_mvvm/domain/exceptions/cart_item_limit_exceeded_exception.dart';
+import 'package:flutter_shopping_cart_mvvm/domain/stories/cart_store.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:provider/provider.dart';
 
 class ProductCard extends StatelessWidget {
   final ProductEntity? product;
@@ -31,7 +34,7 @@ class ProductCard extends StatelessWidget {
                   imageUrl: product!.image,
                   fit: BoxFit.contain,
                   progressIndicatorBuilder: (context, url, progress) {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   },
                 ),
               ),
@@ -57,10 +60,70 @@ class ProductCard extends StatelessWidget {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(onPressed: (){}, child: Text("Add to cart")),
+            child: Consumer<CartStore>(
+              builder: (context, cartStore, child) {
+                final bool productInCart = cartStore.products.any(
+                  (element) => element.product.id == product!.id,
+                );
+                return productInCart
+                    ? _buildQuantitySelector(
+                        context: context,
+                        cartStore: cartStore,
+                        product: product!,
+                      )
+                    : ElevatedButton(
+                        onPressed: () {
+                          try {
+                            cartStore.add(product!);
+                          } on CartItemLimitExceededException catch (e) {
+                            ScaffoldMessenger.of(
+                              context,
+                            ).showSnackBar(SnackBar(content: Text(e.message)));
+                          }
+                        },
+                        child: const Text("Add to cart"),
+                      );
+              },
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildQuantitySelector({
+    required BuildContext context,
+    required CartStore cartStore,
+    required ProductEntity product,
+  }) {
+    final productInCart = cartStore.products.firstWhere(
+      (element) => element.product.id == product.id,
+    );
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.remove),
+          onPressed: () => cartStore.remove(product),
+        ),
+        Text(
+          '${productInCart.quantity}',
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () {
+            try {
+              cartStore.add(product);
+            } on CartItemLimitExceededException catch (e) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(e.message)));
+            }
+          },
+        ),
+      ],
     );
   }
 

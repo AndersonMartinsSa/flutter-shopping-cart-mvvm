@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_shopping_cart_mvvm/domain/entities/product_entity.dart';
 import 'package:flutter_shopping_cart_mvvm/domain/exceptions/product_fetch_exception.dart';
+import 'package:flutter_shopping_cart_mvvm/routing/routes.dart';
 import 'package:flutter_shopping_cart_mvvm/ui/home/home_viewmodel.dart';
+import 'package:flutter_shopping_cart_mvvm/ui/widgets/cart_icon_button.dart';
 import 'package:flutter_shopping_cart_mvvm/ui/widgets/product_card.dart';
 import 'package:flutter_shopping_cart_mvvm/ui/widgets/resut_builder.dart';
 import 'package:provider/provider.dart';
@@ -36,6 +38,10 @@ class _HomePageState extends State<HomePage> {
     viewModel.productsCmd.execute();
   }
 
+  void _cartIconOnTap() {
+    Routes.goToCard(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,6 +49,7 @@ class _HomePageState extends State<HomePage> {
         title: const Text("Store"),
         centerTitle: true,
         automaticallyImplyLeading: false,
+        actions: [CartIconButton(onTap: _cartIconOnTap)],
       ),
       body: RefreshIndicator(
         onRefresh: _onRefresh,

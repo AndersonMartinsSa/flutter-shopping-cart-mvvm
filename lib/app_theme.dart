@@ -42,6 +42,17 @@ class AppTheme {
         ),
       ),
 
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: background,
+          foregroundColor: textPrimary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        ),
+      ),
+
       textTheme: const TextTheme(
         titleLarge: TextStyle(
           fontSize: 18,
