@@ -21,21 +21,16 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     viewModel = context.read();
+    viewModel.getProducts();
     super.initState();
   }
 
-  @override
-  void dispose() {
-    viewModel.dispose();
-    super.dispose();
-  }
-
   void _tryAgainOnTap() {
-    viewModel.productsCmd.execute();
+    viewModel.getProducts();
   }
 
   Future<void> _onRefresh() async {
-    viewModel.productsCmd.execute();
+    viewModel.getProducts();
   }
 
   void _cartIconOnTap() {

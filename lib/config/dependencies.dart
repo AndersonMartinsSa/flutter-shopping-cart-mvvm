@@ -8,6 +8,7 @@ import 'package:flutter_shopping_cart_mvvm/domain/repositories/product_repositor
 import 'package:flutter_shopping_cart_mvvm/domain/stories/cart_store.dart';
 import 'package:flutter_shopping_cart_mvvm/ui/cart/cart_viewmodel.dart';
 import 'package:flutter_shopping_cart_mvvm/ui/home/home_viewmodel.dart';
+import 'package:flutter_shopping_cart_mvvm/ui/order_confirmation/order_confirmation_viewmodel.dart';
 import 'package:flutter_shopping_cart_mvvm/utils/environments.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
@@ -15,13 +16,22 @@ import 'package:provider/single_child_widget.dart';
 List<SingleChildWidget> get _viewmodels {
   return [
     ChangeNotifierProvider(
-      create: (context) => HomeViewModel(productRepository: context.read()),
+      create: (context) => HomeViewModel(
+        productRepository: context.read(),
+        cartStore: context.read(),
+      ),
     ),
-    ChangeNotifierProvider(
+    Provider(
       create: (context) => CartViewModel(
         checkoutRepository: context.read(),
         cartStore: context.read(),
       ),
+      dispose: (context, value) => value.dispose(),
+    ),
+    Provider(
+      create: (context) =>
+          OrderConfirmationViewModel(cartStore: context.read()),
+      dispose: (context, value) => value.dispose(),
     ),
   ];
 }

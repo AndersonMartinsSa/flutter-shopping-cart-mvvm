@@ -22,18 +22,18 @@ class _CartPageState extends State<CartPage> {
   @override
   void initState() {
     viewModel = context.read();
-    configListiners();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      configListiners();
+    });
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    viewModel.dispose();
-    super.dispose();
   }
 
   void configListiners() {
     viewModel.checkoutCmd.addListener(() {
+      if (!mounted) {
+        return;
+      }
+
       if (viewModel.checkoutCmd.completed) {
         Routes.goToOrderConfirmation(context);
         return;

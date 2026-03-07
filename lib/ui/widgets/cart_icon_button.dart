@@ -13,7 +13,7 @@ class CartIconButton extends StatelessWidget {
     return ListenableBuilder(
       listenable: cart,
       builder: (_, __) {
-        final count = cart.totalItems;
+        final count = cart.products.length;
 
         return Padding(
           padding: const EdgeInsets.only(right: 10),

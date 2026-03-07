@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_shopping_cart_mvvm/domain/entities/product_cart_entity.dart';
 import 'package:flutter_shopping_cart_mvvm/domain/entities/product_entity.dart';
-import 'package:flutter_shopping_cart_mvvm/domain/exceptions/cart_item_limit_exceeded_exception.dart';
-import 'package:flutter_shopping_cart_mvvm/domain/stories/cart_store.dart';
+import 'package:flutter_shopping_cart_mvvm/ui/home/home_viewmodel.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:provider/provider.dart';
 
@@ -16,6 +16,12 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    onCartItemLimitExceeded(String message) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    }
+
     if (isLoading) {
       return _buildSkeleton();
     }
@@ -60,27 +66,28 @@ class ProductCard extends StatelessWidget {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(8.0),
-            child: Consumer<CartStore>(
-              builder: (context, cartStore, child) {
-                final bool productInCart = cartStore.products.any(
-                  (element) => element.product.id == product!.id,
-                );
-                return productInCart
+            child: Consumer<HomeViewModel>(
+              builder: (context, viewModel, child) {
+                final ProductCartEntity? productInCart = viewModel
+                    .getProductInCart(product!);
+
+                return productInCart != null
                     ? _buildQuantitySelector(
                         context: context,
-                        cartStore: cartStore,
                         product: product!,
+                        quantity: productInCart.quantity,
+                        onAddProduct: (product) => viewModel.addProduct(
+                          product: product,
+                          onCartItemLimitExceeded: onCartItemLimitExceeded,
+                        ),
+                        onRemoveProduct: (product) =>
+                            viewModel.removeProduct(product),
                       )
                     : ElevatedButton(
-                        onPressed: () {
-                          try {
-                            cartStore.add(product!);
-                          } on CartItemLimitExceededException catch (e) {
-                            ScaffoldMessenger.of(
-                              context,
-                            ).showSnackBar(SnackBar(content: Text(e.message)));
-                          }
-                        },
+                        onPressed: () => viewModel.addProduct(
+                          product: product,
+                          onCartItemLimitExceeded: onCartItemLimitExceeded,
+                        ),
                         child: const Text("Add to cart"),
                       );
               },
@@ -93,35 +100,25 @@ class ProductCard extends StatelessWidget {
 
   Widget _buildQuantitySelector({
     required BuildContext context,
-    required CartStore cartStore,
     required ProductEntity product,
+    required int quantity,
+    required Function(ProductEntity) onRemoveProduct,
+    required Function(ProductEntity) onAddProduct,
   }) {
-    final productInCart = cartStore.products.firstWhere(
-      (element) => element.product.id == product.id,
-    );
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         IconButton(
           icon: const Icon(Icons.remove),
-          onPressed: () => cartStore.remove(product),
+          onPressed: () => onRemoveProduct(product),
         ),
         Text(
-          '${productInCart.quantity}',
+          quantity.toString(),
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         IconButton(
           icon: const Icon(Icons.add),
-          onPressed: () {
-            try {
-              cartStore.add(product);
-            } on CartItemLimitExceededException catch (e) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(e.message)));
-            }
-          },
+          onPressed: () => onAddProduct(product),
         ),
       ],
     );

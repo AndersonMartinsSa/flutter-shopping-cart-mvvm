@@ -14,3 +14,7 @@ final class MoneyEntity {
     return price;
   }
 }
+
+extension MoneyExt on num {
+  MoneyEntity toMoney() => MoneyEntity(value: toDouble());
+}

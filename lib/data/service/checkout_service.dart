@@ -1,5 +1,4 @@
 import 'package:flutter_shopping_cart_mvvm/domain/entities/checkout_entity.dart';
-import 'package:flutter_shopping_cart_mvvm/domain/exceptions/checkout_exception.dart';
 import 'package:flutter_shopping_cart_mvvm/utils/result.dart';
 
 abstract class CheckoutService {

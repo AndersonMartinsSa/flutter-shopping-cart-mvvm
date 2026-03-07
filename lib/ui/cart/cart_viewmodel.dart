@@ -1,11 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_shopping_cart_mvvm/domain/entities/checkout_entity.dart';
 import 'package:flutter_shopping_cart_mvvm/domain/repositories/checkout_repository.dart';
 import 'package:flutter_shopping_cart_mvvm/domain/stories/cart_store.dart';
 import 'package:flutter_shopping_cart_mvvm/utils/command.dart';
 import 'package:flutter_shopping_cart_mvvm/utils/result.dart';
 
-class CartViewModel extends ChangeNotifier {
+class CartViewModel {
   final CheckoutRepository _checkoutRepository;
   final CartStore _cartStore;
 
@@ -27,5 +26,9 @@ class CartViewModel extends ChangeNotifier {
     );
 
     return result;
+  }
+
+  void dispose() {
+    checkoutCmd.dispose();
   }
 }
