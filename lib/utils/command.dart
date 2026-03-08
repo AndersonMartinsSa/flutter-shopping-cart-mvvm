@@ -43,6 +43,8 @@ abstract class Command<T> extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> execute();
 }
 
 final class Command0<T> extends Command<T> {
@@ -50,17 +52,8 @@ final class Command0<T> extends Command<T> {
 
   final CommandAction0<T> _action;
 
+  @override
   Future<void> execute() async {
     await _execute(_action);
-  }
-}
-
-final class Command1<T, A> extends Command<T> {
-  Command1(this._action);
-
-  final CommandAction1<T, A> _action;
-
-  Future<void> execute(A argument) async {
-    await _execute(() => _action(argument));
   }
 }

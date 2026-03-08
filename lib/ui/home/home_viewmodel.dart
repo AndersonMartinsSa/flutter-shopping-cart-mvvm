@@ -11,15 +11,16 @@ class HomeViewModel extends ChangeNotifier {
   final ProductRepository _productRepository;
   final CartStore _cartStore;
 
+  late final Command<List<ProductEntity>> productsCmd; 
+
   HomeViewModel({
     required ProductRepository productRepository,
     required CartStore cartStore,
+    Command<List<ProductEntity>>? productsCommand, 
   }) : _productRepository = productRepository,
        _cartStore = cartStore {
-    productsCmd = Command0(_getProducts);
+    productsCmd = productsCommand ?? Command0(_getProducts); 
   }
-
-  late final Command0<List<ProductEntity>> productsCmd;
 
   void getProducts() {
     productsCmd.execute();
